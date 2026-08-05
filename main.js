@@ -2,7 +2,9 @@
 //  EL RECOLECTOR - Proyecto base
 //  Esto es todo lo que te damos hecho. El resto es tuyo.
 // ============================================================
-
+import Player from "./jugador/jugasdor.js";
+import Caja from "./caja/caja.js"
+import { AnimacionCaja } from "./caja/caja_anim.js";
 const VELOCIDAD_JUGADOR = 400;
 
 const config = {
@@ -13,10 +15,14 @@ const config = {
   physics: {
     default: 'arcade',
     arcade: {
-      // Poné esto en true para ver las cajas de colisión. Te va a servir.
-      debug: false
+      
+        gravity:{y:400},
+        debug: false
     }
-  },
+      // Poné esto en true para ver las cajas de colisión. Te va a servir.
+      
+    }
+  ,
   scene: {
     preload: preload,
     create: create,
@@ -35,6 +41,13 @@ new Phaser.Game(config);
 // Por ahora está vacío porque usamos formas geométricas.
 // ------------------------------------------------------------
 function preload() {
+  this.load.spritesheet('caja', 'assets/caja.png', { 
+    frameWidth: 64, 
+    frameHeight: 64, 
+});
+
+
+
 }
 
 // ------------------------------------------------------------
@@ -43,11 +56,15 @@ function preload() {
 // ------------------------------------------------------------
 function create() {
   // Un rectángulo celeste como jugador. Podés reemplazarlo por un sprite.
-  jugador = this.add.rectangle(400, 550, 70, 20, 0x66ccff);
-
+  this.jugador = new Player(this,400, 550, 70, 20, 0x66ccff);
+  this.jugador.body.setImmovable(true)
   // Le damos un cuerpo de física para poder detectar colisiones más adelante.
   this.physics.add.existing(jugador);
-  jugador.body.setCollideWorldBounds(true);
+
+  this.caja = new Caja(this,400,650,'caja')
+  new AnimacionCaja(this);
+  this.caja.anims.play('destroy')
+
 
   // Las flechas del teclado.
   teclas = this.input.keyboard.createCursorKeys();
@@ -58,13 +75,7 @@ function create() {
 // Acá va lo que cambia con el tiempo.
 // ------------------------------------------------------------
 function update() {
-  if (teclas.left.isDown) {
-    jugador.body.setVelocityX(-VELOCIDAD_JUGADOR);
-  } else if (teclas.right.isDown) {
-    jugador.body.setVelocityX(VELOCIDAD_JUGADOR);
-  } else {
-    jugador.body.setVelocityX(0);
-  }
+ jugador.update();
 }
 
 // ============================================================
