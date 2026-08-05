@@ -8,7 +8,7 @@ export default class Player extends Phaser.GameObjects.Rectangle {
         
         // Propiedades de tu prota
         this.body.setCollideWorldBounds(true);
-        this.speed = 10
+        this.speed = 200
     }
 
     // Método para manejar el movimiento del prota

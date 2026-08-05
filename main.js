@@ -2,9 +2,10 @@
 //  EL RECOLECTOR - Proyecto base
 //  Esto es todo lo que te damos hecho. El resto es tuyo.
 // ============================================================
-import Player from "./jugador/jugasdor.js";
+import Player from "./jugador/jugador.js";
 import Caja from "./caja/caja.js"
 import { AnimacionCaja } from "./caja/caja_anim.js";
+import MiraEspada from "./jugador/mira_Espada.js"
 const VELOCIDAD_JUGADOR = 400;
 
 const config = {
@@ -31,8 +32,8 @@ const config = {
 };
 
 // Variables del juego. Van a crecer.
-let jugador;
-let teclas;
+
+
 
 new Phaser.Game(config);
 
@@ -44,8 +45,10 @@ function preload() {
   this.load.spritesheet('caja', 'assets/caja.png', { 
     frameWidth: 64, 
     frameHeight: 64, 
-});
 
+});
+this.load.image('miraEspada','assets/mira_espada.png')
+this.load.image('flecha','assets/flecha.png')
 
 
 }
@@ -55,19 +58,25 @@ function preload() {
 // Acá se crean las cosas.
 // ------------------------------------------------------------
 function create() {
+  this.fkey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.F);//fullscreen
+  this.input.setDefaultCursor('none');//desactivar mouse
+this.input.mouse.disableContextMenu();//desactivar menu click derecho
   // Un rectángulo celeste como jugador. Podés reemplazarlo por un sprite.
   this.jugador = new Player(this,400, 550, 70, 20, 0x66ccff);
+  this.jugador.allowGravity(false)
   this.jugador.body.setImmovable(true)
   // Le damos un cuerpo de física para poder detectar colisiones más adelante.
-  this.physics.add.existing(jugador);
 
-  this.caja = new Caja(this,400,650,'caja')
+
+  this.caja = new Caja(this,400,400,'caja')
   new AnimacionCaja(this);
-  this.caja.anims.play('destroy')
+
 
 
   // Las flechas del teclado.
-  teclas = this.input.keyboard.createCursorKeys();
+ this.teclas = this.input.keyboard.createCursorKeys();
+ this.miraEspada = new MiraEspada(this,400,300,'miraEspada')
+ this.miraEspada.body.allowGravity = false;
 }
 
 // ------------------------------------------------------------
@@ -75,7 +84,17 @@ function create() {
 // Acá va lo que cambia con el tiempo.
 // ------------------------------------------------------------
 function update() {
- jugador.update();
+ this.jugador.update();
+ this.miraEspada.update(); 
+
+ if (Phaser.Input.Keyboard.JustDown(this.fkey)) {
+  if (this.scale.isFullscreen) {
+      this.scale.stopFullscreen();
+  } else {
+      this.scale.startFullscreen();
+  }
+}
+//fullscreen
 }
 
 // ============================================================
