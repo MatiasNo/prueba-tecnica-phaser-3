@@ -9,7 +9,10 @@ export default class Flecha extends Phaser.GameObjects.Sprite {
         // Propiedades de tu prota
         this.body.setCollideWorldBounds(true);
         this.speed = 200
-     
+        scene.input.on('pointerdown', (pointer) => {
+            if (pointer.leftButtonDown()) {
+                this.iniciarGastoEnergia();
+            }
     }
     iniciarAtaque() {
         if (this.isAttacking) return; // no permite reiniciar el ataque a mitad de otro

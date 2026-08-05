@@ -77,6 +77,8 @@ this.input.mouse.disableContextMenu();//desactivar menu click derecho
  this.teclas = this.input.keyboard.createCursorKeys();
  this.miraEspada = new MiraEspada(this,400,300,'miraEspada')
  this.miraEspada.body.allowGravity = false;
+
+ 
 }
 
 // ------------------------------------------------------------
