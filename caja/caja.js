@@ -10,6 +10,8 @@ export default class Caja extends Phaser.GameObjects.Sprite {
         // Propiedades de tu prota
         this.body.setCollideWorldBounds(true);
         this.speed = 10
+        this.invulnerable = false;
+        this.body.setMaxVelocity(0, 900); // el 900 es un techo, ajustalo probando
 
         this.body.setSize(42, 38);      // ancho y alto del hitbox
         this.body.setOffset(11, 11);    // desplazamiento (x, y) desde la esquina del frame
@@ -28,14 +30,24 @@ export default class Caja extends Phaser.GameObjects.Sprite {
                 this.body.setOffset(hb.x, hb.y);
             }
         });
+
+
          
 
+    }
+    volverseInvulnerable() {
+        if (this.invulnerable) return;
+        this.invulnerable = true;
+        this.body.setImmovable(true); // deja de "flotar" con la física de otros cuerpos
+        this.setTint(0xaaaaaa); //debug      // feedback visual opcional, sacalo si no lo querés
     }
 
     // Método para manejar el movimiento del prota
     update(cursors) {
-        this.body.setVelocity(0);
-
+        
+        if (!this.invulnerable && this.body.blocked.down) {
+            this.volverseInvulnerable();
+        }
         
     }
 }

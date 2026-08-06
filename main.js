@@ -18,8 +18,8 @@ const config = {
     default: 'arcade',
     arcade: {
       
-        gravity:{y:2000},
-        debug: false
+        gravity:{y:400},
+        debug: true
     }
       // Poné esto en true para ver las cajas de colisión. Te va a servir.
       
@@ -81,7 +81,7 @@ this.input.mouse.disableContextMenu();//desactivar menu click derecho
   // Un rectángulo celeste como jugador. Podés reemplazarlo por un sprite.
   this.jugador = new Player(this,400, 550, 70, 20, 0x66ccff);
   this.jugador.body.allowGravity = false;
-  this.jugador.body.setImmovable(true);
+  this.jugador.body.pushable = false;
   // Le damos un cuerpo de física para poder detectar colisiones más adelante.
 
 
@@ -99,6 +99,17 @@ this.input.mouse.disableContextMenu();//desactivar menu click derecho
         }
     });//flechas
  this.physics.add.overlap(flechas, cajas, onFlechaGolpeaCaja, null, this);//collider de flechas y cajas 
+ //cajas invulnarables
+ this.physics.add.collider(cajas, cajas, (cajaA, cajaB) => {
+  if (cajaA.invulnerable || cajaB.invulnerable) {
+      cajaA.volverseInvulnerable();
+      cajaB.volverseInvulnerable();
+  }
+}, (cajaA, cajaB) => cajaA.invulnerable || cajaB.invulnerable, this);
+//cajas invulnerables
+this.physics.add.collider(this.jugador, cajas, null, (jugador, caja) => caja.invulnerable, this);
+//jugador  choca cajas invulnerables
+
 
  cajaTimer = this.time.addEvent({
         delay: tiempoc,
@@ -137,7 +148,7 @@ function onFlechaGolpeaCaja(flecha, caja) {
     flecha.destroy();
     const indexFlecha = flechas.indexOf(flecha);
     if (indexFlecha !== -1) flechas.splice(indexFlecha, 1); // ✅ modifica el array original
-
+    if(caja.invulnerable)return;
     // Reproducir la animación de destrucción en la caja
     caja.anims.play('destroy', true);
 
