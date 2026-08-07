@@ -54,7 +54,7 @@ this.load.image('flecha','assets/flecha.png')
 
 }
 let flechas = [];
-let cajas = [];
+
 let tiempot = 0
 let tiempoc = 1000/(tiempot/5000 + 2);
 let cajaTimer; // referencia global al timer
@@ -64,6 +64,7 @@ let cajaTimer; // referencia global al timer
 // Acá se crean las cosas.
 // ------------------------------------------------------------
 function create() {
+    let cajasGroup; 
 //animations
  new AnimacionCaja(this)
 
@@ -98,16 +99,16 @@ this.input.mouse.disableContextMenu();//desactivar menu click derecho
             crearFlecha(this);
         }
     });//flechas
- this.physics.add.overlap(flechas, cajas, onFlechaGolpeaCaja, null, this);//collider de flechas y cajas 
+ this.physics.add.overlap(flechas, cajasGroup, onFlechaGolpeaCaja, null, this);//collider de flechas y cajas 
  //cajas invulnarables
- this.physics.add.collider(cajas, cajas, (cajaA, cajaB) => {
+ this.physics.add.collider(cajasGroup, cajasGroup, (cajaA, cajaB) => {
   if (cajaA.invulnerable || cajaB.invulnerable) {
       cajaA.volverseInvulnerable();
       cajaB.volverseInvulnerable();
   }
-}, (cajaA, cajaB) => cajaA.invulnerable || cajaB.invulnerable, this);
+}, null, this);
 //cajas invulnerables
-this.physics.add.collider(this.jugador, cajas, null, (jugador, caja) => caja.invulnerable, this);
+this.physics.add.collider(this.jugador, cajasGroup, null, (jugador, caja) => caja.invulnerable, this);
 //jugador  choca cajas invulnerables
 
 
@@ -131,7 +132,7 @@ function crearCaja(scene) {
     const xRandom = Phaser.Math.Between(0, 800); // 0 a config.width
     const caja = new Caja(scene, xRandom, 0, 'caja');
    
-    cajas.push(caja);}
+       cajasGroup.add(caja);}
 
 
 function crearFlecha(scene) {
@@ -155,7 +156,7 @@ function onFlechaGolpeaCaja(flecha, caja) {
     // Cuando la animación termine, esperar 2 segundos y destruir la caja
     caja.once('animationcomplete', () => {
         caja.scene.time.delayedCall(2000, () => {
-            caja.destroy();
+            cajasGroup.remove(caja, true, true); // saca del grupo y destruye
             const indexCaja = cajas.indexOf(caja);
             if (indexCaja !== -1) cajas.splice(indexCaja, 1); // ✅ modifica el array original
         });
@@ -169,7 +170,7 @@ function update() {
  this.jugador.update();
  this.miraEspada.update(); 
   flechas.forEach(flecha => flecha.update());
-  cajas.forEach(caja => caja.update());
+  this.cajasGroup.children.iterate(caja => caja.update());
 
  if (Phaser.Input.Keyboard.JustDown(this.fkey)) {
   if (this.scale.isFullscreen) {
