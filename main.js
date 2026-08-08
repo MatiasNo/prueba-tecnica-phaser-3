@@ -64,7 +64,7 @@ let cajaTimer; // referencia global al timer
 // Acá se crean las cosas.
 // ------------------------------------------------------------
 function create() {
-    let cajasGroup; 
+    this.cajasGroup = this.physics.add.group({   collideWorldBounds: true});
 //animations
  new AnimacionCaja(this)
 
@@ -99,16 +99,16 @@ this.input.mouse.disableContextMenu();//desactivar menu click derecho
             crearFlecha(this);
         }
     });//flechas
- this.physics.add.overlap(flechas, cajasGroup, onFlechaGolpeaCaja, null, this);//collider de flechas y cajas 
+ this.physics.add.overlap(flechas, this.cajasGroup, onFlechaGolpeaCaja, null, this);//collider de flechas y cajas 
  //cajas invulnarables
- this.physics.add.collider(cajasGroup, cajasGroup, (cajaA, cajaB) => {
+ this.physics.add.collider(this.cajasGroup, undefined, (cajaA, cajaB) => {
   if (cajaA.invulnerable || cajaB.invulnerable) {
       cajaA.volverseInvulnerable();
       cajaB.volverseInvulnerable();
   }
 }, null, this);
 //cajas invulnerables
-this.physics.add.collider(this.jugador, cajasGroup, null, (jugador, caja) => caja.invulnerable, this);
+this.physics.add.collider(this.jugador, this.cajasGroup, null, (jugador, caja) => caja.invulnerable, this);
 //jugador  choca cajas invulnerables
 
 
@@ -132,7 +132,7 @@ function crearCaja(scene) {
     const xRandom = Phaser.Math.Between(0, 800); // 0 a config.width
     const caja = new Caja(scene, xRandom, 0, 'caja');
    
-       cajasGroup.add(caja);}
+       scene.cajasGroup.add(caja);}
 
 
 function crearFlecha(scene) {
@@ -141,24 +141,21 @@ function crearFlecha(scene) {
     flechas.push(flecha);
 }
 function onFlechaGolpeaCaja(flecha, caja) {
-    // Evita procesar la misma caja dos veces si ya está siendo destruida
-    if (caja.destruyendo) return;
-    caja.destruyendo = true;
-
-    // Destruir la flecha inmediatamente
+  // Destruir la flecha inmediatamente
     flecha.destroy();
     const indexFlecha = flechas.indexOf(flecha);
     if (indexFlecha !== -1) flechas.splice(indexFlecha, 1); // ✅ modifica el array original
     if(caja.invulnerable)return;
+      if (caja.destruyendo) return;   // Evita procesar la misma caja dos veces si ya está siendo destruida
+       caja.destruyendo = true;
     // Reproducir la animación de destrucción en la caja
     caja.anims.play('destroy', true);
 
     // Cuando la animación termine, esperar 2 segundos y destruir la caja
     caja.once('animationcomplete', () => {
         caja.scene.time.delayedCall(2000, () => {
-            cajasGroup.remove(caja, true, true); // saca del grupo y destruye
-            const indexCaja = cajas.indexOf(caja);
-            if (indexCaja !== -1) cajas.splice(indexCaja, 1); // ✅ modifica el array original
+            caja.scene.cajasGroup.remove(caja, true, true); // saca del grupo y destruye
+           
         });
     });
 }

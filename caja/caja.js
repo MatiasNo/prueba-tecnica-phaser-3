@@ -39,15 +39,19 @@ export default class Caja extends Phaser.GameObjects.Sprite {
         if (this.invulnerable) return;
         this.invulnerable = true;
         this.body.setImmovable(true); // deja de "flotar" con la física de otros cuerpos
+            this.body.setVelocity(0, 0);   // 👈 corta cualquier movimiento residual
+    this.body.allowGravity = false; // 👈 deja de acumular caída
+
         this.setTint(0xaaaaaa); //debug      // feedback visual opcional, sacalo si no lo querés
     }
 
     // Método para manejar el movimiento del prota
     update() {
         
-        if (!this.invulnerable && (this.body.blocked.down || this.body.touching.down)) {
-            this.volverseInvulnerable();
-        }
+        if (!this.invulnerable && !this.destruyendo && (this.body.blocked.down || this.body.touching.down)) {
+        this.volverseInvulnerable();
+    }
+
         
     }
 }
