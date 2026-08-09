@@ -36,7 +36,7 @@ export default class Caja extends Phaser.GameObjects.Sprite {
 
     }
     volverseInvulnerable() {
-        if (this.invulnerable) return;
+        if (this.invulnerable || this.destruyendo) return;
         this.invulnerable = true;
         this.body.setImmovable(true); // deja de "flotar" con la física de otros cuerpos
             this.body.setVelocity(0, 0);   // 👈 corta cualquier movimiento residual

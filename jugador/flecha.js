@@ -6,6 +6,7 @@ export default class Flecha extends Phaser.GameObjects.Sprite {
         scene.physics.add.existing(this);
         
         this.body.setCollideWorldBounds(true);
+        this.body.onWorldBounds = true;
         this.speed = 20;
 
         // Calculamos el ángulo UNA SOLA VEZ, al crearse
